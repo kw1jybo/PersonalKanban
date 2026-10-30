@@ -161,7 +161,8 @@ if (mode !== '--write' && mode !== '--check') {
 }
 
 const { block, problems } = build();
-const current = readFileSync(docPath, 'utf8');
+// Git on Windows may check the doc out with CRLF; compare and write LF so the check is line-ending agnostic.
+const current = readFileSync(docPath, 'utf8').replaceAll('\r\n', '\n');
 const next = splice(current, block);
 
 if (mode === '--write') {
