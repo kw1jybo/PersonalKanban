@@ -27,7 +27,10 @@ function loadWorkspaces() {
   for (const group of ['apps', 'packages']) {
     for (const entry of readdirSync(join(root, group), { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
-      manifests.push({ label: `${group}/${entry.name}`, pkg: readJson(`${group}/${entry.name}/package.json`) });
+      manifests.push({
+        label: `${group}/${entry.name}`,
+        pkg: readJson(`${group}/${entry.name}/package.json`),
+      });
     }
   }
   return manifests;
@@ -88,7 +91,11 @@ function build() {
     table(
       ['Tool', 'Required', 'Pinned in'],
       [
-        ['Node.js', `${rootPkg.engines?.node ?? 'unspecified'} (\`.nvmrc\`: ${nvmrc})`, '`package.json` engines, `.nvmrc`'],
+        [
+          'Node.js',
+          `${rootPkg.engines?.node ?? 'unspecified'} (\`.nvmrc\`: ${nvmrc})`,
+          '`package.json` engines, `.nvmrc`',
+        ],
         ['pnpm', pnpm, '`package.json` packageManager'],
         ['TypeScript', typescript, '`package.json` devDependencies'],
       ],
@@ -105,34 +112,46 @@ function build() {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([name, { ranges, users }]) => {
         const purpose = notes.packages?.[name];
-        if (!purpose) problems.push(`No purpose for ${kind} package "${name}" in docs/dependency-notes.json`);
+        if (!purpose)
+          problems.push(`No purpose for ${kind} package "${name}" in docs/dependency-notes.json`);
         return [`\`${name}\``, [...ranges].join(', '), [...users].join(', '), purpose ?? ''];
       });
     sections.push(`### ${title}`, table(['Package', 'Range', 'Used by', 'Purpose'], rows));
   }
 
-  const used = new Set([...collect(manifests, 'dependencies').keys(), ...collect(manifests, 'devDependencies').keys()]);
+  const used = new Set([
+    ...collect(manifests, 'dependencies').keys(),
+    ...collect(manifests, 'devDependencies').keys(),
+  ]);
   for (const name of Object.keys(notes.packages ?? {})) {
-    if (!used.has(name)) problems.push(`docs/dependency-notes.json documents "${name}" but no package.json uses it`);
+    if (!used.has(name))
+      problems.push(`docs/dependency-notes.json documents "${name}" but no package.json uses it`);
   }
 
   // Environment variables
   const envVars = parseEnvExample();
   const active = new Set(envVars.filter((v) => v.active).map((v) => v.name));
   for (const key of parseEnvSchemaKeys()) {
-    if (!active.has(key)) problems.push(`apps/api/src/env.ts reads ${key} but .env.example does not set it`);
+    if (!active.has(key))
+      problems.push(`apps/api/src/env.ts reads ${key} but .env.example does not set it`);
   }
   const envRows = envVars.map(({ name, value, active: isActive }) => {
     const purpose = notes.env?.[name];
-    if (!purpose) problems.push(`No purpose for environment variable "${name}" in docs/dependency-notes.json`);
+    if (!purpose)
+      problems.push(`No purpose for environment variable "${name}" in docs/dependency-notes.json`);
     return [`\`${name}\``, `\`${value}\``, isActive ? 'in use' : 'planned', purpose ?? ''];
   });
   for (const name of Object.keys(notes.env ?? {})) {
     if (!envVars.some((v) => v.name === name)) {
-      problems.push(`docs/dependency-notes.json documents env var "${name}" but .env.example does not list it`);
+      problems.push(
+        `docs/dependency-notes.json documents env var "${name}" but .env.example does not list it`,
+      );
     }
   }
-  sections.push('### Environment variables', table(['Variable', 'Default', 'Status', 'Purpose'], envRows));
+  sections.push(
+    '### Environment variables',
+    table(['Variable', 'Default', 'Status', 'Purpose'], envRows),
+  );
 
   // CI
   const { runner, actions } = parseCi();
