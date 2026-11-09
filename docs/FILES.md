@@ -1,7 +1,7 @@
 # Files
 
 A guide to what each file in the repository is for. The project is a pnpm workspace with two apps and two
-packages. See `README.md` for the overall design and `docs/ENVIRONMENT.md` for tooling and dependencies.
+packages. See `README.md` for the overall design and `docs/ENVIRONMENT.md` for tooling and dependencies. `docs/FLOW.md` follows one request through the pieces.
 
 ## How the pieces fit
 
@@ -45,6 +45,7 @@ points at it). Other packages may import only what `index.ts` re-exports.
 | `docs/ENVIRONMENT.md`        | Toolchain, dependencies, environment variables and CI actions. Tables are generated     |
 | `docs/dependency-notes.json` | One-line purpose for each dependency and variable; read by the generator                |
 | `docs/FILES.md`              | This file                                                                               |
+| `docs/FLOW.md`               | How one request travels from the browser through the API, `core` and `shared` and back  |
 | `scripts/env-doc.mjs`        | Regenerates `docs/ENVIRONMENT.md` (`pnpm env-doc`) and checks it (`pnpm env-doc:check`) |
 
 ## packages/shared
