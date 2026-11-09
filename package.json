@@ -15,7 +15,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "env-doc": "node scripts/env-doc.mjs --write",
+    "env-doc:check": "node scripts/env-doc.mjs --check"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

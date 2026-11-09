@@ -1,0 +1,33 @@
+{
+  "packages": {
+    "@eslint/js": "ESLint's recommended base rules.",
+    "@tanstack/react-query": "Server-state cache for the web app; the tRPC client is built on it.",
+    "@trpc/client": "Browser-side tRPC client.",
+    "@trpc/server": "tRPC router and procedures on the API. The web app uses it for types only.",
+    "@trpc/tanstack-react-query": "tRPC integration that exposes procedures as TanStack Query options.",
+    "@types/node": "Node.js type definitions for the API.",
+    "@types/react": "React type definitions.",
+    "@types/react-dom": "React DOM type definitions.",
+    "@vitejs/plugin-react": "React support (JSX transform, fast refresh) for Vite.",
+    "eslint": "Linter, run with strict type-checked typescript-eslint rules.",
+    "eslint-config-prettier": "Turns off ESLint rules that conflict with Prettier.",
+    "eslint-plugin-react-hooks": "Enforces the rules of hooks in the web app.",
+    "fastify": "HTTP server for the API.",
+    "globals": "Global-variable sets (node, browser) for ESLint.",
+    "prettier": "Code formatter.",
+    "react": "UI library for the web app.",
+    "react-dom": "React renderer for the browser.",
+    "tsx": "Runs the TypeScript API directly, with watch mode for development.",
+    "typescript": "Compiler used for type checking only (noEmit). Pinned below 6.1 because typescript-eslint does not yet support 7.0.",
+    "typescript-eslint": "TypeScript parser and rules for ESLint.",
+    "vite": "Dev server and bundler for the web app.",
+    "vitest": "Test runner for the API and the packages.",
+    "zod": "Runtime schemas; the TypeScript types are inferred from them."
+  },
+  "env": {
+    "HOST": "Interface the API binds to.",
+    "PORT": "Port the API listens on. Vite proxies /trpc to it.",
+    "LOG_LEVEL": "Fastify log level: fatal, error, warn, info, debug, trace or silent.",
+    "DATABASE_URL": "Database connection string: SQLite locally, Postgres in production. Arrives with the persistence milestone."
+  }
+}
