@@ -117,6 +117,76 @@ zod has two types for a schema with a default:
 applies the default once. If `core` accepted the input type it would have to apply the default itself,
 duplicating the schema.
 
+## Following a change through the code (the greeting example)
+
+How you find every place a change touches, and why the web app needed only one edit. For any new piece of data,
+ask two questions: **where is it defined**, and **who uses it?** Then walk the chain in order.
+
+| Step | Question                | Answer            | File                           |
+| ---- | ----------------------- | ----------------- | ------------------------------ |
+| 1    | Where is the contract?  | The request shape | `packages/shared/.../hello.ts` |
+| 2    | Who builds the message? | `greet()`         | `packages/core/src/hello.ts`   |
+| 3    | Who builds the request? | The form          | `apps/web/src/App.tsx`         |
+
+Steps 2 and 3 come from reading the code. The tools find everything else, and each one catches a different kind
+of miss:
+
+| Tool                | What it caught for the `greeting` field                                                               |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| `pnpm typecheck`    | Two tests in `packages/core` built a `GreetInput` by hand without `greeting` (types, build time)      |
+| `pnpm test`         | Three stale expectations: the schema test, the `greet()` message and the HTTP test (values, run time) |
+| "never read" errors | Two leftover variables in `App.tsx` that nothing used (`noUnusedLocals` in the strict tsconfig)       |
+
+Types cannot see a wrong value, only a wrong shape, so run both commands after every change.
+
+### Why the web app needed only one edit
+
+`apps/web` never writes down what a greet request looks like. The type is derived from the server:
+
+```
+packages/shared/.../hello.ts    GreetInputSchema            the field list
+        |
+apps/api/src/router.ts          .input(GreetInputSchema)    the procedure is defined with that schema
+        |
+apps/api/src/index.ts           export type AppRouter       the router's type carries the input shape
+        |
+apps/web/src/trpc.ts            createTRPCContext<AppRouter>()   the browser imports only that type
+        |
+apps/web/src/App.tsx            trpc.hello.greet.queryOptions({ name, greeting })
+                                                            its parameter type IS the input shape
+```
+
+Adding `greeting` to the schema made `queryOptions` accept a `greeting` property with no edit to the web app's
+types. Try a wrong key such as `greetingg` and the editor flags it. In a project with a hand-written client you
+would update the request type, the response type and every call site. Here those types do not exist. The only
+web code that changed was the code that _uses_ the data: the state, the form and the input box. The web app also
+imports `GreetInputSchema` from `shared` for its own validation, so the browser-side rules are the same object
+as the server's, not a copy.
+
+### Optional fields change nothing downstream
+
+The web edit was optional. With `.default(...)` on the field, the page kept working before any web change: the
+API filled in the default for a missing `greeting`. Had the field been required, the compiler would have broken
+`App.tsx` until it was fixed, the same way it broke the tests. So changing the contract shows what else must
+change, and making a new field optional means nothing else has to change at all.
+
+### Two form patterns the example uses
+
+- **Typed value vs submitted value.** `draft` and `greetingDraft` hold what is in the boxes. `name` and
+  `greetingText` hold what was last submitted, and only those feed the query, so a request goes out on Greet and
+  not on every keystroke.
+- **Empty box means "not provided".** `greetingDraft || undefined` stops an empty box from being sent as `''`,
+  which would fail `min(1)` and silently do nothing. The schema then applies its default, so the browser never
+  repeats it.
+
+### Mistakes this example surfaced
+
+| Mistake                                  | Symptom                                       | Cause                                                                    |
+| ---------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------ |
+| Message code placed in the schema file   | Red squiggles on `input` in `packages/shared` | The schema describes a shape; `greet()` in `core` builds the text        |
+| `` `${input.greeting, input.name}!` ``   | Message was `Ada!` instead of `Hello, Ada!`   | A comma inside one `${ }` keeps only the last value; use one `${ }` each |
+| Existing tests expecting only `{ name }` | Failures in `shared` and `api` tests          | The default now appears in parsed data; update the expected values       |
+
 ## Running it
 
 `pnpm dev` starts both apps. The web app is at http://localhost:5173 and the API at http://127.0.0.1:3000
