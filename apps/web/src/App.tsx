@@ -7,20 +7,35 @@ export function App() {
   const trpc = useTRPC();
   const [draft, setDraft] = useState('');
   const [name, setName] = useState('world');
+  const [greetingDraft, setGreetingDraft] = useState('');
+  const [greetingText, setGreetingText] = useState<string | undefined>(undefined);
 
-  // Input and output types are inferred from the server's router, with no hand-written types.
-  const greeting = useQuery(trpc.hello.greet.queryOptions({ name }));
+  const greeting = useQuery(trpc.hello.greet.queryOptions({ name, greeting: greetingText }));
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const parsed = GreetInputSchema.safeParse({ name: draft });
-    if (parsed.success) setName(parsed.data.name);
+    const parsed = GreetInputSchema.safeParse({
+      name: draft,
+      greeting: greetingDraft || undefined,
+    });
+    if (parsed.success) {
+      setName(parsed.data.name);
+      setGreetingText(parsed.data.greeting);
+    }
   };
 
   return (
     <main style={{ fontFamily: 'system-ui', maxWidth: 480, margin: '4rem auto' }}>
       <h1>PersonalKanban</h1>
       <form onSubmit={handleSubmit}>
+        <input
+          value={greetingDraft}
+          onChange={(e) => {
+            setGreetingDraft(e.target.value);
+          }}
+          placeholder="Greeting"
+          aria-label="Greeting"
+        />
         <input
           value={draft}
           onChange={(e) => {

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const GreetInputSchema = z.object({
   name: z.string().trim().min(1).max(50),
+  greeting: z.string().trim().min(1).max(20).default('Hola'),
 });
 export type GreetInput = z.infer<typeof GreetInputSchema>;
 
