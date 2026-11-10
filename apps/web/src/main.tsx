@@ -18,7 +18,9 @@ function Providers({ children }: { children: React.ReactNode }) {
 }
 
 const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Missing #root element');
+if (!rootElement) {
+  throw new Error('Missing #root element');
+}
 
 createRoot(rootElement).render(
   <StrictMode>

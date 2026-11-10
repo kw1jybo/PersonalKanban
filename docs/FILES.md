@@ -21,22 +21,22 @@ points at it). Other packages may import only what `index.ts` re-exports.
 
 ## Root
 
-| File                       | Purpose                                                                           |
-| -------------------------- | --------------------------------------------------------------------------------- |
-| `package.json`             | Root manifest: scripts (`dev`, `lint`, `test`, `env-doc`...) and shared dev tools |
-| `pnpm-workspace.yaml`      | Declares `apps/*` and `packages/*` as one workspace                               |
-| `pnpm-lock.yaml`           | Exact resolved dependency versions. Generated; never edit by hand                 |
-| `tsconfig.base.json`       | Strict TypeScript settings that every package extends                             |
-| `eslint.config.js`         | Lint rules, including the ban on `any` and the exhaustive-switch check            |
-| `.prettierrc.json`         | Formatter settings                                                                |
-| `.prettierignore`          | Files the formatter skips (lockfile, the generated environment doc)               |
-| `.nvmrc`                   | The Node version to use                                                           |
-| `.env.example`             | Template for your local `.env` (`HOST`, `PORT`, `LOG_LEVEL`)                      |
-| `.gitignore`               | Files git ignores (`node_modules`, `.env`, local databases...)                    |
-| `LICENSE`                  | MIT license                                                                       |
-| `README.md`                | Project overview, layout and type-design notes                                    |
-| `CLAUDE.md`                | Instructions for Claude working in this repo: commands, rules, workflow           |
-| `.github/workflows/ci.yml` | The checks GitHub runs on every push and pull request                             |
+| File                       | Purpose                                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `package.json`             | Root manifest: scripts (`dev`, `lint`, `test`, `env-doc`...) and shared dev tools        |
+| `pnpm-workspace.yaml`      | Declares `apps/*` and `packages/*` as one workspace                                      |
+| `pnpm-lock.yaml`           | Exact resolved dependency versions. Generated; never edit by hand                        |
+| `tsconfig.base.json`       | Strict TypeScript settings that every package extends                                    |
+| `eslint.config.js`         | Lint rules, including the ban on `any`, the exhaustive-switch check and mandatory braces |
+| `.prettierrc.json`         | Formatter settings                                                                       |
+| `.prettierignore`          | Files the formatter skips (lockfile, the generated environment doc)                      |
+| `.nvmrc`                   | The Node version to use                                                                  |
+| `.env.example`             | Template for your local `.env` (`HOST`, `PORT`, `LOG_LEVEL`)                             |
+| `.gitignore`               | Files git ignores (`node_modules`, `.env`, local databases...)                           |
+| `LICENSE`                  | MIT license                                                                              |
+| `README.md`                | Project overview, layout and type-design notes                                           |
+| `CLAUDE.md`                | Instructions for Claude working in this repo: commands, rules, workflow                  |
+| `.github/workflows/ci.yml` | The checks GitHub runs on every push and pull request                                    |
 
 ## docs and scripts
 

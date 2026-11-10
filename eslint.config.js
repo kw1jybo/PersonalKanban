@@ -45,4 +45,8 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   prettier,
+  {
+    // Must stay after `prettier`: eslint-config-prettier turns `curly` off, and the last config wins.
+    rules: { curly: ['error', 'all'] },
+  },
 );
