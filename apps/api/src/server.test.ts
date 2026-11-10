@@ -19,13 +19,21 @@ describe('HTTP server', () => {
     expect(res.json()).toEqual({ status: 'ok' });
   });
 
-  it('serves hello.greet over tRPC', async () => {
+  it('serves hello.greet over tRPC, with the default greeting', async () => {
     const input = encodeURIComponent(JSON.stringify({ name: 'Ada' }));
     const res = await app.inject({ method: 'GET', url: `/trpc/hello.greet?input=${input}` });
     expect(res.statusCode).toBe(200);
     const body = res.json<{ result: { data: { message: string; authenticated: boolean } } }>();
-    expect(body.result.data.message).toBe('Hello, Ada!');
+    expect(body.result.data.message).toBe('Hola, Ada!');
     expect(body.result.data.authenticated).toBe(false);
+  });
+
+  it('uses the greeting the caller sends', async () => {
+    const input = encodeURIComponent(JSON.stringify({ name: 'Ada', greeting: 'Howdy' }));
+    const res = await app.inject({ method: 'GET', url: `/trpc/hello.greet?input=${input}` });
+    expect(res.statusCode).toBe(200);
+    const body = res.json<{ result: { data: { message: string } } }>();
+    expect(body.result.data.message).toBe('Howdy, Ada!');
   });
 
   it('rejects invalid input with 400', async () => {

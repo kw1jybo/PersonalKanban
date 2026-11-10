@@ -8,7 +8,7 @@ export function greet(
   now: Clock = () => new Date(),
 ): GreetOutput {
   return {
-    message: `Hello, ${input.name}!`,
+    message: `${input.greeting}, ${input.name}!`,
     greetedAt: now().toISOString(),
     authenticated: userId !== undefined,
   };

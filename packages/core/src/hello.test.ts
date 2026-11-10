@@ -6,7 +6,7 @@ const fixedClock = () => new Date('2026-01-02T03:04:05.000Z');
 
 describe('greet', () => {
   it('greets anonymous callers', () => {
-    expect(greet(undefined, { name: 'Ada' }, fixedClock)).toEqual({
+    expect(greet(undefined, { name: 'Ada', greeting: 'Hello' }, fixedClock)).toEqual({
       message: 'Hello, Ada!',
       greetedAt: '2026-01-02T03:04:05.000Z',
       authenticated: false,
@@ -15,6 +15,6 @@ describe('greet', () => {
 
   it('flags authenticated callers', () => {
     const userId = UserIdSchema.parse('user_1');
-    expect(greet(userId, { name: 'Ada' }, fixedClock).authenticated).toBe(true);
+    expect(greet(userId, { name: 'Ada', greeting: 'Hello' }, fixedClock).authenticated).toBe(true);
   });
 });
