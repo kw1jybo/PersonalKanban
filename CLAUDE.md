@@ -36,6 +36,8 @@ CI runs typecheck, lint, format:check, env-doc:check and test. Run them all befo
 - **The tsconfig is deliberately strict** (`strict`, `noUncheckedIndexedAccess`,
   `exactOptionalPropertyTypes`, `noImplicitOverride`). Do not loosen it to make code compile; fix the code.
 - **No `any`.** ESLint enforces `no-explicit-any` as an error.
+- **Always use braces** on `if`, `else`, `for` and `while`, even for one-line bodies. ESLint enforces `curly: 'all'`.
+  The rule must stay _after_ `prettier` in `eslint.config.js`, because `eslint-config-prettier` turns it off.
 
 ## Dependencies and environment
 
