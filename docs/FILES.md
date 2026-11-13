@@ -44,6 +44,7 @@ points at it). Other packages may import only what `index.ts` re-exports.
 | ---------------------------- | --------------------------------------------------------------------------------------- |
 | `docs/ENVIRONMENT.md`        | Toolchain, dependencies, environment variables and CI actions. Tables are generated     |
 | `docs/dependency-notes.json` | One-line purpose for each dependency and variable; read by the generator                |
+| `docs/PLAN.md`               | The kanban board plan: decisions, data objects, API, UI and the order of work           |
 | `docs/FILES.md`              | This file                                                                               |
 | `docs/FLOW.md`               | How one request travels from the browser through the API, `core` and `shared` and back  |
 | `scripts/env-doc.mjs`        | Regenerates `docs/ENVIRONMENT.md` (`pnpm env-doc`) and checks it (`pnpm env-doc:check`) |
