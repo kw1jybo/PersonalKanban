@@ -33,6 +33,7 @@ points at it). Other packages may import only what `index.ts` re-exports.
 | `.nvmrc`                   | The Node version to use                                                                  |
 | `.env.example`             | Template for your local `.env` (`HOST`, `PORT`, `LOG_LEVEL`)                             |
 | `.gitignore`               | Files git ignores (`node_modules`, `.env`, local databases...)                           |
+| `.gitattributes`           | Forces LF line endings, so Prettier agrees on Windows and in CI                          |
 | `LICENSE`                  | MIT license                                                                              |
 | `README.md`                | Project overview, layout and type-design notes                                           |
 | `CLAUDE.md`                | Instructions for Claude working in this repo: commands, rules, workflow                  |
@@ -51,15 +52,19 @@ points at it). Other packages may import only what `index.ts` re-exports.
 
 ## packages/shared
 
-| File                   | Purpose                                                             |
-| ---------------------- | ------------------------------------------------------------------- |
-| `package.json`         | Package manifest                                                    |
-| `tsconfig.json`        | Extends the base config                                             |
-| `src/index.ts`         | Public entry point; re-exports the schemas, types and `assertNever` |
-| `src/schemas/hello.ts` | Zod schemas and inferred types for the `greet` input and output     |
-| `src/schemas/user.ts`  | The branded `UserId` type                                           |
-| `src/assert-never.ts`  | Helper that makes a `switch` fail to compile when a case is missing |
-| `src/schemas.test.ts`  | Tests for the schemas                                               |
+| File                            | Purpose                                                             |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `package.json`                  | Package manifest                                                    |
+| `tsconfig.json`                 | Extends the base config                                             |
+| `src/index.ts`                  | Public entry point; re-exports the schemas, types and `assertNever` |
+| `src/test-helpers.ts`           | Test case helper functions                                          |
+| `src/schemas/user.test.ts`      | User tests                                                          |
+| `src/schemas/hello.ts`          | Zod schemas and inferred types for the `greet` input and output     |
+| `src/schemas/user.ts`           | The branded `UserId` type                                           |
+| `src/schemas/work-item.ts`      | Work item schema definitions                                        |
+| `src/schemas/work-item.test.ts` | Work item schema tests                                              |
+| `src/assert-never.ts`           | Helper that makes a `switch` fail to compile when a case is missing |
+| `src/schemas.test.ts`           | Tests for the schemas                                               |
 
 ## packages/core
 
