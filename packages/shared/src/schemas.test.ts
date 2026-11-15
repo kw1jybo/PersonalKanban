@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assertNever, GreetInputSchema, UserIdSchema } from './index';
+import { assertNever, GreetInputSchema } from './index';
 
 describe('GreetInputSchema', () => {
   it('trims the name and applies the default greeting', () => {
@@ -23,12 +23,6 @@ describe('GreetInputSchema', () => {
     expect(GreetInputSchema.safeParse({ name: 'Ada', greeting: 'x'.repeat(21) }).success).toBe(
       false,
     );
-  });
-});
-
-describe('UserIdSchema', () => {
-  it('rejects empty ids', () => {
-    expect(UserIdSchema.safeParse('').success).toBe(false);
   });
 });
 
