@@ -11,6 +11,18 @@ export function expectRejectedAt(
   expect(result.error?.issues[0]?.path).toEqual(checkPath);
 }
 
+/** Removes `field` from a valid input, then expects the schema to reject it at that field. */
+export function expectRejectedWithout(
+  schema: z.ZodType,
+  validInput: Record<string, unknown>,
+  field: string,
+): void {
+  const withoutField = Object.fromEntries(
+    Object.entries(validInput).filter(([key]) => key !== field),
+  );
+  expectRejectedAt(schema, withoutField, field);
+}
+
 export function expectAcceptedAs(
   schema: z.ZodType,
   input: unknown,

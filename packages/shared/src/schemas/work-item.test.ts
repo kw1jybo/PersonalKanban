@@ -6,6 +6,7 @@ import {
   WorkItemStateSchema,
   WorkItemTitleSchema,
   WorkItemNotesSchema,
+  WorkItemNumberSchema,
   WorkItemSchema,
   WorkItemIdInputSchema,
   CreateWorkItemInputSchema,
@@ -14,19 +15,22 @@ import {
   BoardSchema,
   type WorkItemId,
   type UserId,
+  type WorkItem,
+  type WorkItemNumber,
 } from '../index';
-import { expectAcceptedAs, expectRejectedAt } from '../test-helpers';
+import { expectAcceptedAs, expectRejectedAt, expectRejectedWithout } from '../test-helpers';
 
 ////////////////
 
 const validWorkItemBase = {
   id: '1',
+  boardNumber: 7,
   title: 'Test Title',
   notes: 'Test Notes',
   state: 'backlog',
   position: 0,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
   archivedAt: null,
 };
 
@@ -56,6 +60,10 @@ describe('Schema reuse', () => {
     expect(WorkItemIdInputSchema.shape.id).toBe(WorkItemIdSchema);
     expect(UpdateWorkItemInputSchema.shape.id).toBe(WorkItemIdSchema);
     expect(MoveWorkItemInputSchema.shape.id).toBe(WorkItemIdSchema);
+  });
+
+  it('Ensures WorkItemNumberSchema is reused', () => {
+    expect(WorkItemSchema.shape.boardNumber).toBe(WorkItemNumberSchema);
   });
 });
 
@@ -91,6 +99,33 @@ describe('WorkItemIdSchema', () => {
   });
 });
 
+/////////////////
+
+describe('WorkItemNumberSchema', () => {
+  it('should validate a valid work item number', () => {
+    const validNumber = 1;
+    expect(WorkItemNumberSchema.parse(validNumber)).toEqual(validNumber);
+  });
+
+  it('WorkItemNumber is a distinct type, not a plain number or a position', () => {
+    expectTypeOf<number>().not.toExtend<WorkItemNumber>(); // a number is not a WorkItemNumber
+    expectTypeOf<WorkItem['position']>().not.toExtend<WorkItemNumber>(); // a position is not a WorkItemNumber
+    expectTypeOf<WorkItemNumber>().toExtend<number>(); // but a WorkItemNumber is still a number
+  });
+
+  // failure cases
+
+  it.each([
+    ['a string', '41'],
+    ['null', null],
+    ['number too low', 0],
+    ['a non-integer', 1.5],
+    ['a negative number', -1],
+  ])('should reject %s', (_name, input) => {
+    expect(WorkItemNumberSchema.safeParse(input).success).toBe(false);
+  });
+});
+
 ////////////////
 
 describe('WorkItemTitleSchema', () => {
@@ -106,6 +141,8 @@ describe('WorkItemTitleSchema', () => {
   ])('accepts %s', (_name, title, expected = title) => {
     expect(WorkItemTitleSchema.parse(title)).toEqual(expected);
   });
+
+  // failure cases
 
   it.each([
     ['an empty title', ''],
@@ -127,6 +164,8 @@ describe('WorkItemNotesSchema', () => {
   ])('accepts %s', (_name, notes, expected = notes) => {
     expect(WorkItemNotesSchema.parse(notes)).toEqual(expected);
   });
+
+  // failure cases
 
   it.each([['a note too long', 'a'.repeat(NOTES_MAX_LENGTH + 1)]])(
     'should reject %s',
@@ -152,12 +191,14 @@ describe('WorkItemIdInputSchema', () => {
     );
   });
 
+  // failure cases
+
   it('should reject a missing work item ID', () => {
-    expect(WorkItemIdInputSchema.safeParse({}).success).toBe(false);
+    expectRejectedWithout(WorkItemIdInputSchema, validIdInput, 'id');
   });
 
   it('should reject an invalid work item ID', () => {
-    expect(WorkItemIdInputSchema.safeParse({ id: '' }).success).toBe(false);
+    expectRejectedAt(WorkItemIdInputSchema, { ...validIdInput, id: '' }, 'id');
   });
 });
 
@@ -197,8 +238,27 @@ describe('WorkItemSchema', () => {
     // archivedAt
     ['invalid archivedAt', { archivedAt: 'not-a-date' }, 'archivedAt'],
     ['archivedAt missing (null is required instead)', { archivedAt: undefined }, 'archivedAt'],
+    // boardNumber
+    ['boardNumber too low', { boardNumber: 0 }, 'boardNumber'],
+    ['boardNumber not an integer', { boardNumber: 1.5 }, 'boardNumber'],
   ])('rejects %s', (_name, override, field) => {
     expectRejectedAt(WorkItemSchema, { ...validWorkItemBase, ...override }, field);
+  });
+
+  // missing required fields
+
+  it.each([
+    ['id'],
+    ['boardNumber'],
+    ['title'],
+    ['notes'],
+    ['state'],
+    ['position'],
+    ['createdAt'],
+    ['updatedAt'],
+    ['archivedAt'],
+  ])('rejects a missing required field: %s', (name) => {
+    expectRejectedWithout(WorkItemSchema, validWorkItemBase, name);
   });
 });
 
@@ -218,6 +278,7 @@ describe('CreateWorkItemInputSchema', () => {
     ['no notes', { notes: undefined }, { notes: '' }],
     ['state blank', { state: undefined }, { state: 'backlog' }],
     ['drops keys that are not in the schema', { admin: true }, {}],
+    ['drops boardNumber that is not in the schema', { boardNumber: 1 }, {}],
   ])('accepts %s', (_name, override, overrideExpected = override) => {
     expectAcceptedAs(
       CreateWorkItemInputSchema,
@@ -243,6 +304,12 @@ describe('CreateWorkItemInputSchema', () => {
   ])('should reject a create work item input with %s', (_name, override, field) => {
     expectRejectedAt(CreateWorkItemInputSchema, { ...validCreateInput, ...override }, field);
   });
+
+  // missing required fields
+
+  it.each([['title']])('rejects a missing required field: %s', (name) => {
+    expectRejectedWithout(CreateWorkItemInputSchema, validCreateInput, name);
+  });
 });
 
 ////////////////
@@ -261,6 +328,7 @@ describe('UpdateWorkItemInputSchema', () => {
     ['notes with leading and trailing whitespace', { notes: '  Test Notes  ' }],
     ['notes undefined', { notes: undefined }],
     ['drops keys that are not in the schema', { admin: true }, {}],
+    ['drops boardNumber that is not in the schema', { boardNumber: 1 }, {}],
   ])('accepts %s', (_name, override, overrideExpected = override) => {
     expectAcceptedAs(
       UpdateWorkItemInputSchema,
@@ -290,6 +358,12 @@ describe('UpdateWorkItemInputSchema', () => {
   ])('should reject an update work item input with %s', (_name, override, field) => {
     expectRejectedAt(UpdateWorkItemInputSchema, { ...validUpdateInput, ...override }, field);
   });
+
+  // missing required fields
+
+  it.each([['id']])('rejects a missing required field: %s', (name) => {
+    expectRejectedWithout(UpdateWorkItemInputSchema, validUpdateInput, name);
+  });
 });
 
 ////////////////
@@ -304,6 +378,7 @@ describe('MoveWorkItemInputSchema', () => {
   it.each([
     ['nominal', {}],
     ['drops keys that are not in the schema', { admin: true }, {}],
+    ['drops boardNumber that is not in the schema', { boardNumber: 1 }, {}],
     ['non-default values', { state: 'in_progress', position: 3 }],
   ])('accepts %s', (_name, override, overrideExpected = override) => {
     expectAcceptedAs(
@@ -323,36 +398,32 @@ describe('MoveWorkItemInputSchema', () => {
   ])('should reject a move work item input with %s', (_name, override, field) => {
     expectRejectedAt(MoveWorkItemInputSchema, { ...validMoveInput, ...override }, field);
   });
+
+  // missing required fields
+
+  it.each([['id'], ['state'], ['position']])('rejects a missing required field: %s', (name) => {
+    expectRejectedWithout(MoveWorkItemInputSchema, validMoveInput, name);
+  });
 });
 
 ////////////////
 
 describe('BoardSchema', () => {
-  const validItem = {
-    id: '1',
-    title: 'Test Title',
-    notes: '',
-    state: 'done',
-    position: 0,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    archivedAt: null,
-  };
   const emptyBoard = { backlog: [], todo: [], in_progress: [], blocked: [], done: [] };
 
   it('accepts a board with every column present', () => {
-    expectAcceptedAs(BoardSchema, { ...emptyBoard, done: [validItem] });
+    expectAcceptedAs(BoardSchema, { ...emptyBoard, backlog: [validWorkItemBase] });
   });
 
   it('accepts a board with a duplicated item in column', () => {
     expectAcceptedAs(BoardSchema, {
       ...emptyBoard,
-      todo: [validItem, validItem],
+      backlog: [validWorkItemBase, validWorkItemBase],
     });
   });
 
   it('does not check that an item state matches its column', () => {
-    expectAcceptedAs(BoardSchema, { ...emptyBoard, todo: [validItem] }); // validItem.state is 'done'
+    expectAcceptedAs(BoardSchema, { ...emptyBoard, todo: [validWorkItemBase] });
   });
 
   // failure cases
@@ -360,7 +431,7 @@ describe('BoardSchema', () => {
   it('rejects a bad item inside a column, at the nested path', () => {
     expectRejectedAt(
       BoardSchema,
-      { ...emptyBoard, done: [{ ...validItem, title: '' }] },
+      { ...emptyBoard, done: [{ ...validWorkItemBase, title: '' }] },
       'done',
       0,
       'title',

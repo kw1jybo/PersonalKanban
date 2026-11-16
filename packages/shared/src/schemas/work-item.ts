@@ -18,8 +18,12 @@ export type WorkItemNotes = z.infer<typeof WorkItemNotesSchema>;
 export const WorkItemIdInputSchema = z.object({ id: WorkItemIdSchema });
 export type WorkItemIdInput = z.infer<typeof WorkItemIdInputSchema>;
 
+export const WorkItemNumberSchema = z.int().min(1).brand<'WorkItemNumber'>();
+export type WorkItemNumber = z.infer<typeof WorkItemNumberSchema>;
+
 export const WorkItemSchema = z.object({
   id: WorkItemIdSchema,
+  boardNumber: WorkItemNumberSchema,
   title: WorkItemTitleSchema,
   notes: WorkItemNotesSchema,
   state: WorkItemStateSchema,
