@@ -71,7 +71,7 @@ interface WorkItemRepository {
   save(item: WorkItem): Promise<void>; // insert or update
   saveMany(items: WorkItem[]): Promise<void>; // renumbering after a move
   delete(id: WorkItemId): Promise<boolean>; // false if there was no such item; never throws for that
-  nextNumber(): Promise<WorkItemNumber>; // 1, 2, 3...; never goes back, even after a delete
+  nextBoardNumber(): Promise<WorkItemNumber>; // 1, 2, 3...; never goes back, even after a delete
 }
 ```
 

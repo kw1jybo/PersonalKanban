@@ -41,14 +41,15 @@ points at it). Other packages may import only what `index.ts` re-exports.
 
 ## docs and scripts
 
-| File                         | Purpose                                                                                 |
-| ---------------------------- | --------------------------------------------------------------------------------------- |
-| `docs/ENVIRONMENT.md`        | Toolchain, dependencies, environment variables and CI actions. Tables are generated     |
-| `docs/dependency-notes.json` | One-line purpose for each dependency and variable; read by the generator                |
-| `docs/PLAN.md`               | The kanban board plan: decisions, data objects, API, UI and the order of work           |
-| `docs/FILES.md`              | This file                                                                               |
-| `docs/FLOW.md`               | How one request travels from the browser through the API, `core` and `shared` and back  |
-| `scripts/env-doc.mjs`        | Regenerates `docs/ENVIRONMENT.md` (`pnpm env-doc`) and checks it (`pnpm env-doc:check`) |
+| File                           | Purpose                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| `docs/ENVIRONMENT.md`          | Toolchain, dependencies, environment variables and CI actions. Tables are generated     |
+| `docs/dependency-notes.json`   | One-line purpose for each dependency and variable; read by the generator                |
+| `docs/PLAN.md`                 | The kanban board plan: decisions, data objects, API, UI and the order of work           |
+| `docs/FILES.md`                | This file                                                                               |
+| `docs/FLOW.md`                 | How one request travels from the browser through the API, `core` and `shared` and back  |
+| `docs/CSHARP-TO-TYPESCRIPT.md` | A reference mapping C# design habits to their TypeScript equivalents in this project    |
+| `scripts/env-doc.mjs`          | Regenerates `docs/ENVIRONMENT.md` (`pnpm env-doc`) and checks it (`pnpm env-doc:check`) |
 
 ## packages/shared
 
@@ -68,14 +69,22 @@ points at it). Other packages may import only what `index.ts` re-exports.
 
 ## packages/core
 
-| File                | Purpose                                                                                 |
-| ------------------- | --------------------------------------------------------------------------------------- |
-| `package.json`      | Package manifest                                                                        |
-| `tsconfig.json`     | Extends the base config                                                                 |
-| `src/index.ts`      | Public entry point                                                                      |
-| `src/hello.ts`      | The `greet` function; takes a clock so tests can control time                           |
-| `src/errors.ts`     | `DomainError` and its subclasses (`NotFoundError`, `ForbiddenError`, `ValidationError`) |
-| `src/hello.test.ts` | Tests for `greet`                                                                       |
+| File                                         | Purpose                                                                                                      |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `package.json`                               | Package manifest                                                                                             |
+| `tsconfig.json`                              | Extends the base config                                                                                      |
+| `src/deps.ts`                                | What the work-item service is handed: `Clock`, `IdGenerator` and `WorkItemDeps`                              |
+| `src/index.ts`                               | Public entry point; re-exports the errors, `greet`, the dependency types, the repository and the service     |
+| `src/hello.ts`                               | The `greet` function; takes a clock so tests can control time                                                |
+| `src/errors.ts`                              | `DomainError` and its subclasses (`NotFoundError`, `ForbiddenError`, `ValidationError`)                      |
+| `src/hello.test.ts`                          | Tests for `greet`                                                                                            |
+| `src/work-item-repository.ts`                | The `WorkItemRepository` interface: the storage operations that every implementation must provide            |
+| `src/in-memory-work-item-repository.ts`      | The in-memory `WorkItemRepository`, backed by a `Map`; hands out copies, never reuses a board number         |
+| `src/work-item-repository.contract-test.ts`  | `describeWorkItemRepository`: the shared tests every repository implementation must pass; not run on its own |
+| `src/in-memory-work-item-repository.test.ts` | Runs the repository contract against the in-memory implementation                                            |
+| `src/test-fixtures.ts`                       | Test-only helpers: `makeWorkItem`, a counting id generator and a fixed clock; not exported from `index.ts`   |
+| `src/work-item-service.ts`                   | `createWorkItemService(deps)`: `getBoard` (items grouped by state) and `createWorkItem`                      |
+| `src/work-item-service.test.ts`              | Tests for the service, run against the in-memory repository with a fixed clock and a counting id generator   |
 
 ## apps/api
 
