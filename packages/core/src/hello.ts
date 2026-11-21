@@ -1,6 +1,5 @@
 import type { GreetInput, GreetOutput, UserId } from '@personalkanban/shared';
-
-export type Clock = () => Date;
+import type { Clock } from './deps';
 
 export function greet(
   userId: UserId | undefined,
