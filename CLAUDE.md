@@ -77,5 +77,6 @@ Never run Stryker on `master` or on a branch intended to accumulate feature work
 
 The language rules live once, in `C:\Code\.claude\lang\`, and this repo imports only the ones it uses. Do not copy them here, and do not use symlinks (Windows checks them out as plain text).
 
+@../.claude/lang/common.md
 @../.claude/lang/typescript.md
 @../.claude/lang/javascript.md
