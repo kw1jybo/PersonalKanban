@@ -72,3 +72,10 @@ If any work involves running a mutation testing tool (Stryker or equivalent), th
 Never run Stryker on `master` or on a branch intended to accumulate feature work. A machine reboot, crash, or interrupted run must not leave the working branch in a dirty or inconsistent state.
 
 **New repository rule:** Every new repository created under `C:\Code` must include a `CLAUDE.md` file at its root containing this Mutation Testing Branch Isolation rule. Creating a repo without it is not acceptable.
+
+## Language rules (shared)
+
+The language rules live once, in `C:\Code\.claude\lang\`, and this repo imports only the ones it uses. Do not copy them here, and do not use symlinks (Windows checks them out as plain text).
+
+@../.claude/lang/typescript.md
+@../.claude/lang/javascript.md
